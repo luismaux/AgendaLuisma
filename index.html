@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Mis anotaciones">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=6">
+  <link rel="stylesheet" href="./styles.css?v=7">
   <title>Mis anotaciones</title>
 </head>
 <body>
@@ -55,7 +55,7 @@
 
     <section id="settingsView" class="view" hidden>
       <h1>Ajustes y copias</h1>
-      <p class="small muted">Versión 6</p>
+      <p class="small muted">Versión 7</p>
       <div class="panel">
         <h2>Notificaciones</h2>
         <p class="muted small">Permite las notificaciones para recibir avisos. Android puede limitar la entrega si la aplicación está cerrada o el sistema ahorra batería.</p>
@@ -64,9 +64,10 @@
       </div>
       <div class="panel">
         <h2>Copia de seguridad</h2>
-        <p class="muted small">La copia semanal se intenta realizar cuando abres la aplicación y hay conexión. Para una copia automática garantizada con la app cerrada hace falta un servicio de servidor adicional.</p>
-        <button id="driveConnect" class="primary full">Conectar con Google Drive</button>
+        <p class="muted small">Al conectar con Google, cada anotación se guarda como evento en Google Calendar con sus avisos (suenan aunque cierres la app) y la copia en Drive se actualiza sola cada vez que guardas o borras algo.</p>
+        <button id="driveConnect" class="primary full">Conectar con Google (Drive y Calendar)</button>
         <button id="driveBackup" class="secondary full">Guardar copia ahora en Drive</button>
+        <button id="calSync" class="secondary full">Sincronizar avisos con Calendar ahora</button>
         <button id="exportBackup" class="secondary full">Descargar copia JSON</button>
         <label class="file-label">Restaurar copia JSON<input id="importBackup" type="file" accept="application/json"></label>
         <p id="driveStatus" class="small"></p>
@@ -109,6 +110,6 @@
     <div class="alert-content"><img class="app-mark" src="./icons/icon-192.png" alt="Icono de Mis anotaciones"><h2 id="confirmTitle">Confirmar</h2><p id="confirmMessage"></p><div class="dialog-actions"><button id="confirmNo" class="secondary" style="flex:1">Cancelar</button><button id="confirmYes" class="primary" style="flex:1">Continuar</button></div></div>
   </dialog>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="./app.js?v=6"></script>
+  <script src="./app.js?v=7"></script>
 </body>
 </html>
