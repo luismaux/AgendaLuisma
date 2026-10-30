@@ -76,7 +76,7 @@ $("closeDialog").onclick=$("cancelNote").onclick=()=>$("noteDialog").close();
 $("openCalendar").onclick=()=>show("calendarView");$("homeBtn").onclick=()=>show("homeView");$("settingsBtn").onclick=()=>show("settingsView");$("settingsBack").onclick=()=>show("calendarView");
 $("prevMonth").onclick=()=>{shownMonth.setMonth(shownMonth.getMonth()-1);renderCalendar();};$("nextMonth").onclick=()=>{shownMonth.setMonth(shownMonth.getMonth()+1);renderCalendar();};$("todayBtn").onclick=()=>{shownMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);selectedDate=isoDate(new Date());renderCalendar();};
 $("navHome").onclick=()=>show("homeView");$("navCalendar").onclick=()=>show("calendarView");$("navSettings").onclick=()=>show("settingsView");
-$("exitBtn").onclick=()=>closeApp();
+$("exitBtn").onclick=async()=>{if(await customConfirm("Salir de la aplicación","¿Quieres cerrar la aplicación?","Cerrar"))closeApp();};
 function closeApp(){
  try{persist();}catch(e){}
  window.close();
@@ -84,7 +84,7 @@ function closeApp(){
   setTimeout(()=>{if(document.visibilityState==="hidden")return;customAlert("No se pudo cerrar","Android no ha permitido cerrar la aplicación desde aquí. Sal con el gesto o botón Inicio de tu móvil. Tus anotaciones quedan guardadas.");},500);},300);
 }
 function customAlert(title,message){$("alertTitle").textContent=title;$("alertMessage").textContent=message;$("alertDialog").showModal();}
-function customConfirm(title,message){return new Promise(resolve=>{$("confirmTitle").textContent=title;$("confirmMessage").textContent=message;const dlg=$("confirmDialog");const yes=()=>{cleanup();dlg.close();resolve(true);};const no=()=>{cleanup();dlg.close();resolve(false);};function cleanup(){$("confirmYes").removeEventListener("click",yes);$("confirmNo").removeEventListener("click",no);} $("confirmYes").addEventListener("click",yes);$("confirmNo").addEventListener("click",no);dlg.showModal();});}
+function customConfirm(title,message,yesLabel="Continuar"){return new Promise(resolve=>{$("confirmTitle").textContent=title;$("confirmYes").textContent=yesLabel;$("confirmMessage").textContent=message;const dlg=$("confirmDialog");const yes=()=>{cleanup();dlg.close();resolve(true);};const no=()=>{cleanup();dlg.close();resolve(false);};function cleanup(){$("confirmYes").removeEventListener("click",yes);$("confirmNo").removeEventListener("click",no);} $("confirmYes").addEventListener("click",yes);$("confirmNo").addEventListener("click",no);dlg.showModal();});}
 $("alertOk").onclick=()=>$("alertDialog").close();
 $("enableNotifications").onclick=async()=>{if(!("Notification" in window)){customAlert("No disponible","Este navegador no admite notificaciones.");return;}const p=await Notification.requestPermission();$("notificationStatus").textContent=p==="granted"?"Notificaciones permitidas.":"No se han concedido permisos.";scheduleReminders();};
 function notify(title,body,sound=true){if(Notification.permission!=="granted")return;const opts={body,icon:"./icons/icon-192.png",badge:"./icons/icon-192.png",tag:"note-"+title,renotify:false};if(sound){opts.vibrate=[250,100,250];}if(navigator.serviceWorker?.controller)navigator.serviceWorker.ready.then(reg=>reg.showNotification(title,opts));else new Notification(title,opts);}
@@ -123,3 +123,4 @@ window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredIns
 $("installBtn").onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$("installBtn").hidden=true;};
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.error));
 load();show("homeView");scheduleReminders();maybeWeeklyBackup();
+
