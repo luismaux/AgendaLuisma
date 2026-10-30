@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#2463b8">
+  <meta name="color-scheme" content="light">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="description" content="Calendario personal de anotaciones y recordatorios">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Mis anotaciones">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png">
+  <link rel="stylesheet" href="./styles.css">
+  <title>Mis anotaciones</title>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><img class="brand-icon" src="./icons/icon-192.png" alt="Icono de Mis anotaciones"><div><strong>Mis anotaciones</strong><small>Tu calendario personal</small></div></div>
+    <button id="installBtn" class="icon-btn" hidden aria-label="Instalar aplicación">＋</button>
+  </header>
+
+  <main>
+    <section id="homeView" class="view">
+      <p class="eyebrow">HOY</p>
+      <h1 id="todayTitle"></h1>
+      <p id="todayLong" class="muted"></p>
+      <div class="section-heading"><h2>Anotaciones de hoy</h2><span id="todayCount" class="count">0</span></div>
+      <div id="todayNotes" class="notes-list"></div>
+      <div id="todayEmpty" class="empty">No tienes anotaciones para hoy.</div>
+      <button id="openCalendar" class="primary full">▦　Abrir calendario</button>
+      <button id="exitBtn" class="secondary full">Salir de la aplicación</button>
+      <div class="notice" id="permissionNotice"></div>
+    </section>
+
+    <section id="calendarView" class="view" hidden>
+      <div class="calendar-head">
+        <button id="prevMonth" class="round-btn" aria-label="Mes anterior">‹</button>
+        <div class="month-title"><h1 id="monthTitle"></h1><button id="todayBtn" class="text-btn">Ir a hoy</button></div>
+        <button id="nextMonth" class="round-btn" aria-label="Mes siguiente">›</button>
+      </div>
+      <div class="calendar-grid weekday-row">
+        <span>L</span><span>M</span><span>X</span><span>J</span><span>V</span><span class="muted-day">S</span><span class="muted-day">D</span>
+      </div>
+      <div id="calendarGrid" class="calendar-grid"></div>
+      <div class="legend"><span><i class="dot note-dot"></i> Con anotaciones</span><span><i class="dot holiday-dot"></i> Festivo / fin de semana</span></div>
+      <div class="calendar-actions">
+        <button id="homeBtn" class="secondary">← Inicio</button>
+        <button id="settingsBtn" class="secondary">⚙ Ajustes y copias</button>
+      </div>
+      <p class="small muted">Pulsa un día para consultar, añadir o modificar anotaciones.</p>
+    </section>
+
+    <section id="settingsView" class="view" hidden>
+      <h1>Ajustes y copias</h1>
+      <div class="panel">
+        <h2>Notificaciones</h2>
+        <p class="muted small">Permite las notificaciones para recibir avisos. Android puede limitar la entrega si la aplicación está cerrada o el sistema ahorra batería.</p>
+        <button id="enableNotifications" class="primary full">Activar notificaciones</button>
+        <p id="notificationStatus" class="small"></p>
+      </div>
+      <div class="panel">
+        <h2>Copia de seguridad</h2>
+        <p class="muted small">La copia semanal se intenta realizar cuando abres la aplicación y hay conexión. Para una copia automática garantizada con la app cerrada hace falta un servicio de servidor adicional.</p>
+        <button id="driveConnect" class="primary full">Conectar con Google Drive</button>
+        <button id="driveBackup" class="secondary full">Guardar copia ahora en Drive</button>
+        <button id="exportBackup" class="secondary full">Descargar copia JSON</button>
+        <label class="file-label">Restaurar copia JSON<input id="importBackup" type="file" accept="application/json"></label>
+        <p id="driveStatus" class="small"></p>
+      </div>
+      <div class="panel">
+        <h2>Festivos locales</h2>
+        <p class="muted small">Los festivos nacionales y autonómicos fijos y los móviles calculados se incluyen en el calendario. Añade aquí los dos festivos locales de Salamanca de cada año, comprobándolos en el calendario oficial publicado por el Ayuntamiento.</p>
+        <label for="localHolidays">Fechas locales (una por línea, formato AAAA-MM-DD)</label>
+        <textarea id="localHolidays" rows="4" placeholder="2026-06-12&#10;2026-09-08"></textarea>
+        <button id="saveHolidays" class="secondary full">Guardar festivos locales</button>
+      </div>
+      <button id="settingsBack" class="secondary full">← Volver al calendario</button>
+    </section>
+  </main>
+
+  <nav id="bottomNav" class="bottom-nav" hidden><button id="navHome">⌂<span>Inicio</span></button><button id="navCalendar">▦<span>Calendario</span></button><button id="navSettings">⚙<span>Ajustes</span></button></nav>
+
+  <dialog id="noteDialog">
+    <form id="noteForm" method="dialog">
+      <div class="dialog-brand"><img src="./icons/icon-192.png" alt="Icono de Mis anotaciones"><strong>Mis anotaciones</strong></div>
+      <div class="dialog-head"><div><p class="eyebrow">ANOTACIONES DEL DÍA</p><h2 id="dialogDate"></h2></div><button type="button" class="close-btn" id="closeDialog" aria-label="Cerrar">×</button></div>
+      <input type="hidden" id="noteId">
+      <label for="noteText">¿Qué quieres recordar?</label>
+      <textarea id="noteText" rows="4" required maxlength="3000" placeholder="Escribe tu anotación…"></textarea>
+      <label for="noteTime">Hora (opcional)</label><input id="noteTime" type="time">
+      <fieldset><legend>Recordatorios</legend>
+        <label class="check"><input id="remindPrevious" type="checkbox" checked> Avisarme el día anterior</label>
+        <label class="check"><input id="remindSame" type="checkbox" checked> Avisarme el mismo día</label>
+        <label class="check"><input id="remindSound" type="checkbox" checked> Sonido / alarma si el dispositivo lo permite</label>
+      </fieldset>
+      <div id="existingNotes" class="existing-notes"></div>
+      <div class="dialog-actions"><button type="button" id="deleteNote" class="danger" hidden>Eliminar</button><span class="spacer"></span><button type="button" id="cancelNote" class="secondary">Cancelar</button><button type="submit" class="primary">Guardar</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="alertDialog" class="alert-dialog">
+    <div class="alert-content"><img class="app-mark" src="./icons/icon-192.png" alt="Icono de Mis anotaciones"><h2 id="alertTitle">Recordatorio</h2><p id="alertMessage"></p><button id="alertOk" class="primary full">Entendido</button></div>
+  </dialog>
+  <dialog id="confirmDialog" class="alert-dialog">
+    <div class="alert-content"><img class="app-mark" src="./icons/icon-192.png" alt="Icono de Mis anotaciones"><h2 id="confirmTitle">Confirmar</h2><p id="confirmMessage"></p><div class="dialog-actions"><button id="confirmNo" class="secondary" style="flex:1">Cancelar</button><button id="confirmYes" class="primary" style="flex:1">Continuar</button></div></div>
+  </dialog>
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <script src="./app.js"></script>
+</body>
+</html>

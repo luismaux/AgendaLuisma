@@ -1,0 +1,18 @@
+ACTUALIZACIÓN AZUL v3 – MIS ANOTACIONES
+
+Sube y reemplaza en GitHub Pages estos archivos y carpetas:
+- index.html
+- styles.css
+- manifest.webmanifest
+- sw.js   (IMPORTANTE: este archivo arregla la caché que te seguía mostrando la versión antigua)
+- carpeta icons/ completa
+
+NO sustituyas app.js: conserva así el identificador OAuth de Google que ya configuraste.
+
+Cambios:
+- Cabecera de todas las pantallas en azul con el icono real de la app (sin lápiz).
+- La ventana de anotaciones también lleva el icono y el nombre arriba.
+- Barra inferior, fondo, barra de estado y ventanas emergentes en azul.
+- El service worker ahora carga primero de internet, así los cambios futuros se ven sin borrar datos.
+
+Después de publicar, abre la web en el móvil, cierra la app por completo y vuelve a abrirla (dos veces la primera vez). Si sigue la barra de estado antigua, desinstala la PWA y vuelve a instalarla desde el menú de Chrome.
