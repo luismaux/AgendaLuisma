@@ -76,7 +76,13 @@ $("closeDialog").onclick=$("cancelNote").onclick=()=>$("noteDialog").close();
 $("openCalendar").onclick=()=>show("calendarView");$("homeBtn").onclick=()=>show("homeView");$("settingsBtn").onclick=()=>show("settingsView");$("settingsBack").onclick=()=>show("calendarView");
 $("prevMonth").onclick=()=>{shownMonth.setMonth(shownMonth.getMonth()-1);renderCalendar();};$("nextMonth").onclick=()=>{shownMonth.setMonth(shownMonth.getMonth()+1);renderCalendar();};$("todayBtn").onclick=()=>{shownMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);selectedDate=isoDate(new Date());renderCalendar();};
 $("navHome").onclick=()=>show("homeView");$("navCalendar").onclick=()=>show("calendarView");$("navSettings").onclick=()=>show("settingsView");
-$("exitBtn").onclick=()=>customAlert("Salir de la aplicación","Android no permite que una PWA cierre por sí misma la ventana. Puedes salir con el gesto o botón Inicio de tu móvil. Tus anotaciones quedan guardadas.");
+$("exitBtn").onclick=()=>closeApp();
+function closeApp(){
+ try{persist();}catch(e){}
+ window.close();
+ setTimeout(()=>{if(document.visibilityState==="hidden")return;history.back();
+  setTimeout(()=>{if(document.visibilityState==="hidden")return;customAlert("No se pudo cerrar","Android no ha permitido cerrar la aplicación desde aquí. Sal con el gesto o botón Inicio de tu móvil. Tus anotaciones quedan guardadas.");},500);},300);
+}
 function customAlert(title,message){$("alertTitle").textContent=title;$("alertMessage").textContent=message;$("alertDialog").showModal();}
 function customConfirm(title,message){return new Promise(resolve=>{$("confirmTitle").textContent=title;$("confirmMessage").textContent=message;const dlg=$("confirmDialog");const yes=()=>{cleanup();dlg.close();resolve(true);};const no=()=>{cleanup();dlg.close();resolve(false);};function cleanup(){$("confirmYes").removeEventListener("click",yes);$("confirmNo").removeEventListener("click",no);} $("confirmYes").addEventListener("click",yes);$("confirmNo").addEventListener("click",no);dlg.showModal();});}
 $("alertOk").onclick=()=>$("alertDialog").close();
@@ -96,7 +102,7 @@ function addTimer(at,n,msg){const delay=at-Date.now();if(delay<2147480000){const
 function renderSettings(){
  $("localHolidays").value=(settings.localHolidays||[]).join("\n");
  $("notificationStatus").textContent=("Notification" in window)?("Estado: "+Notification.permission):"Este navegador no admite notificaciones.";
- $("driveStatus").textContent=settings.driveClientId?"Cliente de Google configurado.":"Para conectar Drive, configura primero el ID de cliente OAuth en app.js (instrucciones en README).";
+ $("driveStatus").textContent=GOOGLE_CLIENT_ID?"Cliente de Google configurado.":"Para conectar Drive, configura primero el ID de cliente OAuth en app.js (instrucciones en README).";
 }
 $("saveHolidays").onclick=()=>{const values=$("localHolidays").value.split(/\s+/).map(x=>x.trim()).filter(Boolean);if(values.some(x=>!/^\d{4}-\d{2}-\d{2}$/.test(x))){customAlert("Formato incorrecto","Usa una fecha por línea con formato AAAA-MM-DD.");return;}settings.localHolidays=values;persist();renderCalendar();customAlert("Guardado","Se han actualizado los festivos locales.");};
 $("exportBackup").onclick=()=>downloadBackup();
@@ -107,7 +113,7 @@ $("importBackup").onchange=async e=>{const f=e.target.files[0];if(!f)return;try{
 // Google Drive: subida de un JSON a la carpeta raíz usando OAuth de Google Identity Services.
 let accessToken=null;
 const GOOGLE_CLIENT_ID = "427258421301-4kho0jdrnhgup5hlbmi5r6hb87019mfb.apps.googleusercontent.com";
-$("driveConnect").onclick=()=>{if(!window.google?.accounts?.oauth2){customAlert("Google no está listo","Comprueba tu conexión y vuelve a intentarlo.");return;}if(!GOOGLE_CLIENT_ID||GOOGLE_CLIENT_ID.includes("TU_ID_DE_CLIENTE")){customAlert("Falta configurar Google","Sigue los pasos de configuración de Google Drive que aparecen en README.md.");return;}const client=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:"https://www.googleapis.com/auth/drive.file",callback:resp=>{if(resp.access_token){accessToken=resp.access_token;$("driveStatus").textContent="Google Drive conectado para esta sesión.";uploadDriveBackup();}else customAlert("Error de acceso","No se pudo autorizar Google Drive.");}});client.requestAccessToken();};
+$("driveConnect").onclick=()=>{if(!window.google?.accounts?.oauth2){customAlert("Google no está listo","Comprueba tu conexión y vuelve a intentarlo.");return;}const client=google.accounts.oauth2.initTokenClient({client_id:GOOGLE_CLIENT_ID,scope:"https://www.googleapis.com/auth/drive.file",callback:resp=>{if(resp.access_token){accessToken=resp.access_token;$("driveStatus").textContent="Google Drive conectado para esta sesión.";uploadDriveBackup();}else customAlert("Error de acceso","No se pudo autorizar Google Drive.");}});client.requestAccessToken();};
 $("driveBackup").onclick=()=>{if(!accessToken){customAlert("Conecta Google Drive","Pulsa primero «Conectar con Google Drive».");return;}uploadDriveBackup();};
 async function uploadDriveBackup(){
  try{const metadata={name:"mis-anotaciones-copia.json",mimeType:"application/json"};const blob=new Blob([JSON.stringify(backupData(),null,2)],{type:"application/json"});const body=new FormData();body.append("metadata",new Blob([JSON.stringify(metadata)],{type:"application/json"}));body.append("file",blob);const res=await fetch("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart",{method:"POST",headers:{Authorization:"Bearer "+accessToken},body});if(!res.ok)throw Error(await res.text());settings.lastBackup=new Date().toISOString();persist();$("driveStatus").textContent="Copia guardada correctamente en Google Drive.";customAlert("Copia guardada","Tus anotaciones se han copiado en Google Drive.");}catch(e){$("driveStatus").textContent="No se pudo guardar la copia. Comprueba la conexión y permisos.";console.error(e);}
@@ -117,4 +123,3 @@ window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredIns
 $("installBtn").onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$("installBtn").hidden=true;};
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.error));
 load();show("homeView");scheduleReminders();maybeWeeklyBackup();
-
