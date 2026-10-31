@@ -27,8 +27,9 @@ function holidays(year){
  (settings.localHolidays||[]).filter(x=>x.startsWith(year+"-")).forEach(x=>map[x]="Festivo local");
  return map;
 }
+function holidayName(dateStr){const n=holidays(+dateStr.slice(0,4))[dateStr];return n?(n==="Festivo local"?n:"Festivo: "+n):"";}
 function renderHome(){
- const now=new Date();$("todayTitle").textContent=fmt(now,{weekday:"long",day:"numeric",month:"long"});$("todayLong").textContent=fmt(now,{year:"numeric"});
+ const now=new Date();$("todayTitle").textContent=fmt(now,{weekday:"long",day:"numeric",month:"long"});$("todayLong").textContent=fmt(now,{year:"numeric"});{const hname=holidayName(isoDate(now));$("todayHoliday").textContent=hname;$("todayHoliday").hidden=!hname;}
  const todays=notes.filter(n=>n.date===isoDate(now)).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
  $("todayCount").textContent=todays.length;$("todayNotes").innerHTML="";
  $("todayEmpty").hidden=todays.length>0;
@@ -40,16 +41,15 @@ function renderCalendar(){
  $("monthTitle").textContent=fmt(shownMonth,{month:"long",year:"numeric"});
  const grid=$("calendarGrid");grid.innerHTML="";
  const year=shownMonth.getFullYear(),month=shownMonth.getMonth(),first=new Date(year,month,1),start=(first.getDay()+6)%7;
- const days=new Date(year,month+1,0).getDate(),prevDays=new Date(year,month,0).getDate(),holidayMap=holidays(year),today=isoDate(new Date());
+ const days=new Date(year,month+1,0).getDate(),prevDays=new Date(year,month,0).getDate(),holidayCache={},hol=y=>holidayCache[y]||(holidayCache[y]=holidays(y)),today=isoDate(new Date());
  for(let i=0;i<42;i++){
   let dateObj, outside=false;
   if(i<start){dateObj=new Date(year,month-1,prevDays-start+i+1);outside=true;}
   else if(i>=start+days){dateObj=new Date(year,month+1,i-start-days+1);outside=true;}
   else dateObj=new Date(year,month,i-start+1);
-  const key=isoDate(dateObj),isWeekend=dateObj.getDay()===0||dateObj.getDay()===6,holiday=holidayMap[key],hasNotes=notes.some(n=>n.date===key);
+  const key=isoDate(dateObj),isWeekend=dateObj.getDay()===0||dateObj.getDay()===6,holiday=hol(dateObj.getFullYear())[key],hasNotes=notes.some(n=>n.date===key);
   const b=document.createElement("button");b.className="day"+(outside?" outside":"")+(isWeekend?" weekend":"")+(holiday?" holiday":"")+(key===today?" today":"")+(key===selectedDate?" selected":"");
   const num=document.createElement("span");num.className="daynum";num.textContent=dateObj.getDate();b.append(num);
-  if(holiday){const hn=document.createElement("span");hn.className="holiday-name";hn.textContent=holiday;b.append(hn);}
   if(hasNotes){const dot=document.createElement("i");dot.className="dot";b.append(dot);}
   b.addEventListener("click",()=>openNote(key));grid.append(b);
  }
@@ -60,7 +60,7 @@ function openNote(date,id=null){
  $("noteId").value=n?.id||"";$("noteText").value=n?.text||"";$("noteTime").value=n?.time||"";
  $("remindPrevious").checked=n?n.remindPrevious:true;$("remindSame").checked=n?n.remindSame:true;$("remindSound").checked=n?n.remindSound:true;
  $("dialogDate").textContent=fmt(parseDate(date),{weekday:"long",day:"numeric",month:"long",year:"numeric"});
- $("deleteNote").hidden=!n;
+ $("deleteNote").hidden=!n;{const hname=holidayName(date);$("dialogHoliday").textContent=hname;$("dialogHoliday").hidden=!hname;}
  $("existingNotes").innerHTML="";
  existing.filter(x=>x.id!==id).forEach(x=>{const b=document.createElement("button");b.textContent="Editar: "+x.text.slice(0,65);b.addEventListener("click",()=>openNote(date,x.id));$("existingNotes").append(b);});
  $("noteDialog").showModal();
