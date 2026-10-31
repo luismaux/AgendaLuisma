@@ -13,13 +13,13 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Mis anotaciones">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=12">
+  <link rel="stylesheet" href="./styles.css?v=13">
   <title>Mis anotaciones</title>
 </head>
 <body>
   <header class="topbar">
     <div class="brand"><img class="brand-icon" src="./icons/icon-192.png" alt="Icono de Mis anotaciones"><div><strong>Mis anotaciones</strong><small>Tu calendario personal</small></div></div>
-    <div class="top-actions"><button id="installBtn" class="icon-btn" hidden aria-label="Instalar aplicación">＋</button><button id="topSettings" class="icon-btn" aria-label="Ajustes y copias"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button></div>
+    <div class="top-actions"><button id="installBtn" class="icon-btn" hidden aria-label="Instalar aplicación">＋</button><button id="topSettings" class="top-icon" aria-label="Ajustes y copias"><img src="./icons/icon-ajustes.png" alt=""></button><button id="topExit" class="top-icon" aria-label="Salir de la aplicación"><img src="./icons/icon-salir.png" alt=""></button></div>
   </header>
 
   <main>
@@ -32,7 +32,6 @@
       <div id="todayNotes" class="notes-list"></div>
       <div id="todayEmpty" class="empty">No tienes anotaciones para hoy.</div>
       <button id="openCalendar" class="primary full">▦　Abrir calendario</button>
-      <button id="exitBtn" class="secondary full">Salir de la aplicación</button>
       <div class="notice" id="permissionNotice"></div>
     </section>
 
@@ -55,7 +54,7 @@
 
     <section id="settingsView" class="view" hidden>
       <h1>Ajustes y copias</h1>
-      <p class="small muted">Versión 12</p>
+      <p class="small muted">Versión 13</p>
       <div class="panel">
         <h2>Notificaciones</h2>
         <p class="muted small">Permite las notificaciones para recibir avisos. Android puede limitar la entrega si la aplicación está cerrada o el sistema ahorra batería.</p>
@@ -113,6 +112,6 @@
     <div class="alert-content"><img class="app-mark" src="./icons/icon-192.png" alt="Icono de Mis anotaciones"><h2>Aviso para mañana</h2><p id="tomorrowDate" class="holiday-tag"></p><div id="tomorrowList"></div><div class="dialog-actions"><button id="tomorrowAccept" class="secondary" style="flex:1">Aceptar</button><button id="tomorrowGotIt" class="primary" style="flex:1">Entendido</button></div><p class="small muted">«Entendido»: no volverá a salir este aviso. «Aceptar»: volverá a salir cada vez que abras la app hoy.</p></div>
   </dialog>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="./app.js?v=12"></script>
+  <script src="./app.js?v=13"></script>
 </body>
 </html>

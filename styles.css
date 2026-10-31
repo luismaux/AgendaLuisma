@@ -2,3 +2,7 @@
 .day .daynum{font-weight:600}.day.holiday .daynum{color:#d32f2f;font-weight:800}.holiday-tag{margin:4px 0 0;font-size:15px;font-weight:700;color:#d32f2f}.dialog-head .holiday-tag{font-size:13px}
 
 .day .dot,.note-dot{background:#d32f2f!important}#tomorrowList{max-height:38dvh;overflow:auto;margin:8px 0 4px}.tomorrow-item{text-align:left;white-space:pre-wrap;overflow-wrap:anywhere;margin:8px 0;padding:10px 12px;background:#edf3fc;border-radius:12px;font-size:14px}
+
+.top-actions{display:flex;gap:8px;align-items:center}#topSettings{display:grid;place-items:center;padding:0}
+
+.top-icon{background:none;border:0;padding:0;width:40px;height:40px;cursor:pointer;display:block;flex:0 0 40px}.top-icon img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 1px 3px #0003)}.top-icon:active{transform:scale(.93)}

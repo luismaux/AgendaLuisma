@@ -77,7 +77,7 @@ $("closeDialog").onclick=$("cancelNote").onclick=()=>$("noteDialog").close();
 $("openCalendar").onclick=()=>show("calendarView");$("homeBtn").onclick=()=>show("homeView");$("topSettings").onclick=()=>show("settingsView");$("settingsBack").onclick=()=>show(viewBeforeSettings);
 $("prevMonth").onclick=()=>{shownMonth.setMonth(shownMonth.getMonth()-1);renderCalendar();};$("nextMonth").onclick=()=>{shownMonth.setMonth(shownMonth.getMonth()+1);renderCalendar();};$("todayBtn").onclick=()=>{shownMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);selectedDate=isoDate(new Date());renderCalendar();};
 $("navHome").onclick=()=>show("homeView");$("navCalendar").onclick=()=>show("calendarView");
-$("exitBtn").onclick=async()=>{if(await customConfirm("Salir de la aplicación","¿Quieres cerrar la aplicación?","Cerrar"))closeApp();};
+$("topExit").onclick=async()=>{if(await customConfirm("Salir de la aplicación","¿Quieres cerrar la aplicación?","Cerrar"))closeApp();};
 function closeApp(){
  try{persist();}catch(e){}
  window.close();
