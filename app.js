@@ -12,7 +12,8 @@ function isoDate(d){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart
 function parseDate(s){const [y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d,12);}
 function load(){try{notes=JSON.parse(localStorage.getItem(DB_KEY)||"[]");settings={...settings,...JSON.parse(localStorage.getItem(SETTINGS_KEY)||"{}")};}catch(e){notes=[];}}
 function persist(){localStorage.setItem(DB_KEY,JSON.stringify(notes));localStorage.setItem(SETTINGS_KEY,JSON.stringify({...settings,driveToken:null}));}
-function show(view){["homeView","calendarView","settingsView"].forEach(id=>$(id).hidden=id!==view);$("bottomNav").hidden=view==="homeView";if(view==="homeView")renderHome();if(view==="calendarView")renderCalendar();if(view==="settingsView")renderSettings();}
+let currentView="homeView",viewBeforeSettings="calendarView";
+function show(view){if(view==="settingsView"&&currentView!=="settingsView")viewBeforeSettings=currentView;currentView=view;["homeView","calendarView","settingsView"].forEach(id=>$(id).hidden=id!==view);$("bottomNav").hidden=view==="homeView";if(view==="homeView")renderHome();if(view==="calendarView")renderCalendar();if(view==="settingsView")renderSettings();}
 function fmt(d,opts){return new Intl.DateTimeFormat("es-ES",opts).format(d);}
 function easterSunday(year){const a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;return new Date(year,month-1,day,12);}
 function holidays(year){
@@ -73,9 +74,9 @@ $("noteForm").addEventListener("submit",e=>{
 });
 $("deleteNote").onclick=()=>{const id=$("noteId").value;const gone=notes.find(n=>n.id===id);if(gone?.calEventId)(settings.calPendingDelete=settings.calPendingDelete||[]).push(gone.calEventId);notes=notes.filter(n=>n.id!==id);settings.backupDirty=true;persist();$("noteDialog").close();renderCalendar();renderHome();scheduleReminders();cloudSync(true);};
 $("closeDialog").onclick=$("cancelNote").onclick=()=>$("noteDialog").close();
-$("openCalendar").onclick=()=>show("calendarView");$("homeBtn").onclick=()=>show("homeView");$("settingsBtn").onclick=()=>show("settingsView");$("settingsBack").onclick=()=>show("calendarView");
+$("openCalendar").onclick=()=>show("calendarView");$("homeBtn").onclick=()=>show("homeView");$("topSettings").onclick=()=>show("settingsView");$("settingsBack").onclick=()=>show(viewBeforeSettings);
 $("prevMonth").onclick=()=>{shownMonth.setMonth(shownMonth.getMonth()-1);renderCalendar();};$("nextMonth").onclick=()=>{shownMonth.setMonth(shownMonth.getMonth()+1);renderCalendar();};$("todayBtn").onclick=()=>{shownMonth=new Date(new Date().getFullYear(),new Date().getMonth(),1);selectedDate=isoDate(new Date());renderCalendar();};
-$("navHome").onclick=()=>show("homeView");$("navCalendar").onclick=()=>show("calendarView");$("navSettings").onclick=()=>show("settingsView");
+$("navHome").onclick=()=>show("homeView");$("navCalendar").onclick=()=>show("calendarView");
 $("exitBtn").onclick=async()=>{if(await customConfirm("Salir de la aplicación","¿Quieres cerrar la aplicación?","Cerrar"))closeApp();};
 function closeApp(){
  try{persist();}catch(e){}
