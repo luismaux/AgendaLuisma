@@ -69,7 +69,7 @@ $("noteForm").addEventListener("submit",e=>{
  e.preventDefault();const text=$("noteText").value.trim();if(!text)return;
  const id=$("noteId").value||crypto.randomUUID();const old=notes.findIndex(n=>n.id===id);
  const item={id,date:selectedDate,text,time:$("noteTime").value,remindPrevious:$("remindPrevious").checked,remindSame:$("remindSame").checked,remindSound:$("remindSound").checked,createdAt:new Date().toISOString()};
- item.calEventId=old>=0?(notes[old].calEventId||null):null;item.calDirty=true;settings.backupDirty=true;if(old>=0)notes[old]=item;else notes.push(item);persist();$("noteDialog").close();renderCalendar();scheduleReminders();cloudSync(true);if(selectedDate===isoDate(new Date()))renderHome();
+ item.calEventId=old>=0?(notes[old].calEventId||null):null;item.prevDismissed=old>=0&&notes[old].date===item.date&&!!notes[old].prevDismissed;item.calDirty=true;settings.backupDirty=true;if(old>=0)notes[old]=item;else notes.push(item);persist();$("noteDialog").close();renderCalendar();scheduleReminders();cloudSync(true);if(selectedDate===isoDate(new Date()))renderHome();
 });
 $("deleteNote").onclick=()=>{const id=$("noteId").value;const gone=notes.find(n=>n.id===id);if(gone?.calEventId)(settings.calPendingDelete=settings.calPendingDelete||[]).push(gone.calEventId);notes=notes.filter(n=>n.id!==id);settings.backupDirty=true;persist();$("noteDialog").close();renderCalendar();renderHome();scheduleReminders();cloudSync(true);};
 $("closeDialog").onclick=$("cancelNote").onclick=()=>$("noteDialog").close();
@@ -242,8 +242,25 @@ $("calSync").onclick=async()=>{
  const ok=await cloudSync(true);
  customAlert(ok?"Avisos sincronizados":"Sincronización incompleta",ok?"Tus avisos están en Google Calendar.":"Mira el mensaje de estado debajo de los botones.");
 };
+// Aviso emergente del día anterior (independiente de Google Calendar).
+let shownTomorrowIds=[],tomorrowOpen=false,hiddenAt=0;
+function checkTomorrowNotice(){
+ if(tomorrowOpen||document.querySelector("dialog[open]"))return;
+ const d=new Date();d.setDate(d.getDate()+1);const key=isoDate(d);
+ const list=notes.filter(n=>n.date===key&&n.remindPrevious&&!n.prevDismissed).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+ if(!list.length)return;
+ shownTomorrowIds=list.map(n=>n.id);
+ $("tomorrowDate").textContent="Mañana, "+fmt(parseDate(key),{weekday:"long",day:"numeric",month:"long"});
+ const box=$("tomorrowList");box.innerHTML="";
+ list.forEach(n=>{const p=document.createElement("p");p.className="tomorrow-item";if(n.time){const t=document.createElement("strong");t.textContent=n.time+" – ";p.append(t);}p.append(document.createTextNode(n.text));box.append(p);});
+ tomorrowOpen=true;$("tomorrowDialog").showModal();
+}
+$("tomorrowDialog").addEventListener("close",()=>{tomorrowOpen=false;});
+$("tomorrowAccept").onclick=()=>$("tomorrowDialog").close();
+$("tomorrowGotIt").onclick=()=>{notes.forEach(n=>{if(shownTomorrowIds.includes(n.id))n.prevDismissed=true;});persist();$("tomorrowDialog").close();};
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")hiddenAt=Date.now();else if(hiddenAt&&Date.now()-hiddenAt>60000)checkTomorrowNotice();});
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("installBtn").hidden=false;});
 $("installBtn").onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$("installBtn").hidden=true;};
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.error));
-load();show("homeView");scheduleReminders();autoSync();
+load();show("homeView");scheduleReminders();autoSync();checkTomorrowNotice();
 
