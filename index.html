@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Mis anotaciones">
   <link rel="apple-touch-icon" href="./icons/icon-192.png">
-  <link rel="stylesheet" href="./styles.css?v=9">
+  <link rel="stylesheet" href="./styles.css?v=10">
   <title>Mis anotaciones</title>
 </head>
 <body>
@@ -56,7 +56,7 @@
 
     <section id="settingsView" class="view" hidden>
       <h1>Ajustes y copias</h1>
-      <p class="small muted">Versión 9</p>
+      <p class="small muted">Versión 10</p>
       <div class="panel">
         <h2>Notificaciones</h2>
         <p class="muted small">Permite las notificaciones para recibir avisos. Android puede limitar la entrega si la aplicación está cerrada o el sistema ahorra batería.</p>
@@ -95,8 +95,8 @@
       <textarea id="noteText" rows="4" required maxlength="3000" placeholder="Escribe tu anotación…"></textarea>
       <label for="noteTime">Hora (opcional)</label><input id="noteTime" type="time">
       <fieldset><legend>Recordatorios</legend>
-        <label class="check"><input id="remindPrevious" type="checkbox" checked> Avisarme el día anterior</label>
-        <label class="check"><input id="remindSame" type="checkbox" checked> Avisarme el mismo día</label>
+        <label class="check"><input id="remindPrevious" type="checkbox" checked> Avisarme el día anterior (a las 09:00)</label>
+        <label class="check"><input id="remindSame" type="checkbox" checked> Avisarme el mismo día (1 hora antes de la hora)</label>
         <label class="check"><input id="remindSound" type="checkbox" checked> Sonido / alarma si el dispositivo lo permite</label>
       </fieldset>
       <div id="existingNotes" class="existing-notes"></div>
@@ -114,6 +114,6 @@
     <div class="alert-content"><img class="app-mark" src="./icons/icon-192.png" alt="Icono de Mis anotaciones"><h2>Aviso para mañana</h2><p id="tomorrowDate" class="holiday-tag"></p><div id="tomorrowList"></div><div class="dialog-actions"><button id="tomorrowAccept" class="secondary" style="flex:1">Aceptar</button><button id="tomorrowGotIt" class="primary" style="flex:1">Entendido</button></div><p class="small muted">«Entendido»: no volverá a salir este aviso. «Aceptar»: volverá a salir cada vez que abras la app hoy.</p></div>
   </dialog>
   <script src="https://accounts.google.com/gsi/client" async defer></script>
-  <script src="./app.js?v=9"></script>
+  <script src="./app.js?v=10"></script>
 </body>
 </html>

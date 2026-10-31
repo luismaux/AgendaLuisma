@@ -96,7 +96,7 @@ function scheduleReminders(){
   if(settings.googleLinked&&n.calEventId)return;
   const base=parseDate(n.date);
   if(n.remindPrevious){const d=new Date(base);d.setDate(d.getDate()-1);d.setHours(9,0,0,0);if(d.getTime()>now)addTimer(d.getTime(),n,"Mañana: "+n.text);}
-  if(n.remindSame){const d=new Date(base);const [h,m]=(n.time||"09:00").split(":").map(Number);d.setHours(h,m,0,0);if(d.getTime()>now)addTimer(d.getTime(),n,n.text);}
+  if(n.remindSame){const d=new Date(base);const [h,m]=(n.time||"09:00").split(":").map(Number);d.setHours(h,m,0,0);if(n.time)d.setTime(d.getTime()-3600000);if(d.getTime()>now)addTimer(d.getTime(),n,n.time?"En 1 hora ("+n.time+"): "+n.text:n.text);}
  });
 }
 function addTimer(at,n,msg){const delay=at-Date.now();if(delay<2147480000){const t=setTimeout(()=>notify("Mis anotaciones",msg,n.remindSound),delay);reminderTimers.push(t);}}
@@ -146,7 +146,7 @@ function eventBody(n){
  const end=new Date(start.getTime()+30*60000);
  const local=d=>isoDate(d)+"T"+String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")+":00";
  const overrides=[];
- if(n.remindSame)overrides.push({method:"popup",minutes:0});
+ if(n.remindSame)overrides.push({method:"popup",minutes:n.time?60:0});
  if(n.remindPrevious){const prev=new Date(start);prev.setDate(prev.getDate()-1);prev.setHours(9,0,0,0);overrides.push({method:"popup",minutes:Math.max(0,Math.round((start-prev)/60000))});}
  return {summary:n.text.split("\n")[0].slice(0,100),description:n.text+"\n\n— Creado desde Mis anotaciones",start:{dateTime:local(start),timeZone:tz},end:{dateTime:local(end),timeZone:tz},reminders:{useDefault:false,overrides},extendedProperties:{private:{misAnotacionesId:n.id}}};
 }
@@ -262,5 +262,6 @@ document.addEventListener("visibilitychange",()=>{if(document.visibilityState===
 window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredInstall=e;$("installBtn").hidden=false;});
 $("installBtn").onclick=async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;$("installBtn").hidden=true;};
 if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(console.error));
-load();show("homeView");scheduleReminders();autoSync();checkTomorrowNotice();
+load();show("homeView");if(settings.googleLinked&&settings.calRemindVer!==2){notes.forEach(n=>{if(needsEvent(n))n.calDirty=true;});settings.calRemindVer=2;persist();}
+scheduleReminders();autoSync();checkTomorrowNotice();
 
